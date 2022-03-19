@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration scan="true">
+    <logger name="_org.springframework" level="WARN"/>
+    <logger name="com.example.architecture" level="DEBUG"/>
+<%_ if (persistenceLayer) { _%>
+    <logger name="liquibase" level="INFO"/>
+<%_ } _%>    
+<%_ if(testcontainers){ _%>
+    <logger name="org.testcontainers" level="WARN"/>
+<%_ } _%>    
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.example" level="DEBUG"/>
+
+    <include resource="com/example/spring/architecture/logging/logback/defaults.xml"/>
+</configuration>

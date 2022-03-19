@@ -1,0 +1,47 @@
+# -*- mode: Python -*-
+
+# For more information, see: https://tilt.dev/
+
+# BEFORE 'tilp up' THIS FILE, FIRST EXEC COMMAND  'export GITLAB_PRIVATE_TOKEN=<private_token>'
+
+# For more on Extensions, see: https://docs.tilt.dev/extensions.html
+load('ext://restart_process', 'docker_build_with_restart')
+	
+maven_command = './mvnw'
+if os.name == "nt":
+	maven_command = 'mvnw.cmd'
+	
+gitlab_private_token = os.getenv('GITLAB_PRIVATE_TOKEN')
+  
+local_resource(
+  'maven_package',
+  maven_command + ' clean package -Dmaven.test.skip=true -Dgitlab.private.token=' + gitlab_private_token,
+  deps=['src', 'pom.xml']
+)
+
+extract_layers_command = 'java -Djarmode=layertools -jar $(ls .) extract'
+if os.name == "nt":
+	extract_layers_command = 'for %x in (*.jar) do java -Djarmode=layertools -jar %x extract'
+
+local_resource(
+	'extract_layers',
+	extract_layers_command,
+	dir='./target',
+	deps=['src', 'pom.xml'],
+	resource_deps=['maven_package']	
+)
+
+docker_build_with_restart(
+  '<%- bannerName %>',
+  './target',
+  dockerfile='./Dockerfile',
+  entrypoint='java org.springframework.boot.loader.JarLauncher',
+  live_update=[
+  	sync('./target/application', '/app/application'),
+  	sync('./target/snapshot-dependencies', '/app/snapshot-dependencies'),
+    sync('./target/dependencies', '/app/dependencies'),
+  ]
+)
+
+k8s_resource('<%- bannerName %>', port_forwards=8082)
+k8s_yaml('kubernetes.yaml')

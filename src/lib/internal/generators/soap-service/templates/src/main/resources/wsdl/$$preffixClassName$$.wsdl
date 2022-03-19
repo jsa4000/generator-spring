@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://impl.soap.<%- artifactId %>.example.com/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:ns1="http://api.soap.<%- artifactId %>.example.com/"
+                  name="<%- preffixClassName %>WsService"
+                  targetNamespace="http://impl.soap.<%- artifactId %>.example.com/">
+  <wsdl:import location="<%- preffixClassName %>WsPortType.xml" namespace="http://api.soap.<%- artifactId %>.example.com/">
+  </wsdl:import>
+  <wsdl:binding name="<%- preffixClassName %>WsImplServiceSoapBinding" type="ns1:<%- preffixClassName %>WsPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="create<%- preffixClassName %>">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="create<%- preffixClassName %>">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="create<%- preffixClassName %>Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="update<%- preffixClassName %>ById">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="update<%- preffixClassName %>ById">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="update<%- preffixClassName %>ByIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="delete<%- preffixClassName %>ById">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="delete<%- preffixClassName %>ById">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="delete<%- preffixClassName %>ByIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="find<%- preffixClassName %>ById">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="find<%- preffixClassName %>ById">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="find<%- preffixClassName %>ByIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="find<%- preffixClassName %>Page">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="find<%- preffixClassName %>Page">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="find<%- preffixClassName %>PageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="<%- preffixClassName %>WsImplService">
+    <wsdl:port binding="tns:<%- preffixClassName %>WsImplServiceSoapBinding" name="<%- preffixClassName %>WsImplPort">
+      <soap:address location="http://localhost:8080/services/<%- preffixClassName %>WS"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

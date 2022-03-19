@@ -1,0 +1,118 @@
+spring:
+  application:
+    name: <%- bannerName %>
+  profiles:
+    active: local
+    group:
+      prod: jsonlog, on-premise-common, on-premise-prod
+      uat: jsonlog, on-premise-common, on-premise-uat
+<%_ if(persistenceLayer){ _%>
+      local: h2-local-database, localhost-deploy
+      tilt: h2-local-database, k8s-local-deploy
+<%_ } else { _%>
+      local: localhost-deploy
+      tilt: k8s-local-deploy
+<%_ } _%>
+<%_ if(microserviceType === 'codefirst') { _%>
+application:
+# Enable OpenAPI code-first
+  restapi:
+    openapi:
+      code-first:
+        enabled: true
+<%_ } _%>
+<%_ if(persistenceLayer){ _%>
+---
+spring:
+  config:
+    activate:
+      on-profile: h2-local-database
+  h2:
+    console:
+      enabled: true
+      path: /h2
+      settings:
+        trace: false
+        web-allow-others: false
+  datasource:
+    url: jdbc:h2:mem:<%- projectName %>-microservice-database
+    username: test
+    password: test
+    driver-class-name: org.h2.Driver
+application:
+  jpa:
+    logging:
+      fine:
+        enabled: true
+      parameters:
+        enabled: true
+<%_ } _%>
+---
+spring:
+  config:
+    activate:
+      on-profile: localhost-deploy
+<%_ if(microserviceType !== 'none' || feignClient || __self__._isSoapService()){ _%>
+application:
+  <%_ if(__self__._isCronGenerator()) { _%>
+  <%- projectName %>:
+    cron:
+      delayInSeconds: 60
+  <%_ } _%>
+  <%_ if(microserviceType !== 'none' || __self__._isSoapService()){ _%>
+  security:
+    fake: 
+      enabled: true 
+      username: fakeuser
+      authorities:
+        - ROLE_ADMIN
+  # keycloak:
+  #   auth-server-url: https://kubernetes.internal.svc/auth
+  #   realm: SPRING
+  #   insecure: false
+  <%_ } _%>
+  <%_ if(feignClient){ _%>
+  feign:
+    clients:
+      externalmicroservice:
+# XXX: See com.example.<%- artifactId %>.feign.externalservice.config.ClientConfiguration class
+        security:
+          bearerAuth:
+            exchange:
+              enabled: true
+# XXX: See com.example.<%- artifactId %>.feign.externalservice.api.* @FeignClient classes
+        endpoints:
+          external:
+            name: external-example-microservice
+            url: http://localhost:8082/api
+  <%_ } _%>
+<%_ } _%>
+<%_ if(microserviceType !== 'none' || __self__._isSoapService()){ _%>
+server:
+  port : 8080
+<%_ } _%>
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: jsonlog
+---
+spring:
+  config:
+    activate:
+      on-profile: on-premise-common
+---
+spring:
+  config:
+    activate:
+      on-profile: on-premise-uat
+---
+spring:
+  config:
+    activate:
+      on-profile: on-premise-prod

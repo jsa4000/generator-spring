@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example.architecture</groupId>
+        <artifactId>spring-architecture-library-parent</artifactId>
+        <version>0.4.0-SNAPSHOT</version>
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId><%- projectName %>-spiservice</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name><%- projectName %>-spiservice</name>
+
+    <%_ if(feignClient || persistenceLayer){ _%>
+    <properties>
+        <package.name>com.example.<%- artifactId %></package.name>
+        <%_ if(persistenceLayer){ _%>
+        <liquibase.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</liquibase.driver>
+        <liquibase.dialect>org.hibernate.dialect.SQLServerDialect</liquibase.dialect>
+        <%_ } _%>
+    </properties>
+    <%_ } _%>
+
+    <dependencies>
+        <%_ if(persistenceLayer){ _%>
+        <dependency>
+            <groupId>${spring.architecture.groupId}</groupId>
+            <artifactId>crud-services-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- SQL Server JDBC Driver -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <%_ } _%>
+        <%_ if(feignClient){ _%>
+        <dependency>
+            <groupId>${spring.architecture.groupId}</groupId>
+            <artifactId>feign-spring-boot-starter</artifactId>
+        </dependency>
+        <%_ } _%>
+        <%_ if(jaxws){ _%>
+        <!-- JAX-WS Architecture -->
+        <dependency>
+            <groupId>${spring.architecture.groupId}</groupId>
+            <artifactId>jaxws-spring-boot-starter</artifactId>
+        </dependency>
+        <%_ } _%>
+        <%_ if(!persistenceLayer && !feignClient && !jaxws){ _%>
+        <dependency>
+            <groupId>${spring.architecture.groupId}</groupId>
+            <artifactId>core-spring-boot-starter</artifactId>
+        </dependency>
+        <%_ } _%>
+        <!-- Test dependencies -->
+        <%_ if(cucumberTest){ _%>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <%_ } _%>
+        <%_ if(testcontainers){ _%>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+            <%_ if(persistenceLayer){ _%>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mssqlserver</artifactId>
+            <scope>test</scope>
+        </dependency>
+            <%_ } _%>
+        <%_ } _%>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <%_ if(persistenceLayer){ _%>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+            </plugin>
+            <%_ } _%>
+            <%_ if(jaxws || feignClient){ _%>
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <executions>
+                    <%_ if(feignClient){ _%>
+                    <execution>
+                        <id>openapi-client-download-spec</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://fixme.example.com/put/here/your/openapi/file/openapi.yaml</url>
+                            <outputFileName>external-service-openapi.yaml</outputFileName>
+                            <overwrite>true</overwrite>
+                            <skipCache>true</skipCache>
+                            <outputDirectory>${project.build.directory}/extra-resources/openapi/client</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <%_ } _%>
+                    <%_ if(jaxws){ _%>
+                    <execution>
+                        <id>download-wsdl-client-spec</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://fixme.example.com/put/here/your/wsdl/file/ExternalWebService.wsdl</url>
+                            <outputFileName>ExternalWebService.wsdl</outputFileName>
+                            <overwrite>true</overwrite>
+                            <skipCache>true</skipCache>
+                            <outputDirectory>${project.build.directory}/extra-resources/wsdl</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <%_ } _%>
+                </executions>
+            </plugin>
+            <%_ } _%>
+            <%_ if(jaxws){ _%>
+            <plugin>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-soap-webservice-client</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>${project.build.directory}/extra-resources/wsdl/ExternalWebService.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <bindingFiles>
+                                <bindingFile>${project.build.directory}/extra-resources/jaxb/bindings.xml</bindingFile>
+                            </bindingFiles>
+                            <keep>true</keep>
+                            <verbose>true</verbose>
+                            <extension>true</extension>
+                            <vmArgs>
+                                <vmArg>-Djavax.xml.accessExternalDTD=all</vmArg>
+                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+                            </vmArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <%_ } _%>
+            <%_ if(feignClient){ _%>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-feign-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.build.directory}/extra-resources/openapi/client/external-service-openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-cloud</library>
+                            <templateDirectory>${project.build.directory}/extra-resources/mustache/spring-cloud</templateDirectory>
+                            <apiPackage>${package.name}.feign.externalservice.api</apiPackage>
+                            <modelPackage>${package.name}.feign.externalservice.dto</modelPackage>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <configOptions>
+                                <configPackage>${package.name}.feign.externalservice.config</configPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <java8>true</java8>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <%_ } _%>
+        </plugins>
+    </build>
+</project>

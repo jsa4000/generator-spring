@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "moduleResolution": "Node",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "src/*/templates"]
+}

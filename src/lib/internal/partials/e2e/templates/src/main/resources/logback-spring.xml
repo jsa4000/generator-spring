@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration scan="true">
+    <logger name="_org.springframework" level="WARN"/>
+
+    <springProfile name="local">
+        <logger name="com.example.architecture" level="DEBUG"/>
+    </springProfile>
+
+    <springProfile name="dev">
+        <logger name="com.example.architecture" level="INFO"/>
+    </springProfile>
+
+    <springProfile name="local | dev">
+        <logger name="liquibase" level="INFO"/>
+        <logger name="org.springframework" level="INFO"/>
+<%_ if(microserviceType !== 'none'){ _%>
+        <logger name="org.springframework.web" level="WARN"/>
+<%_ } _%>
+        <logger name="com.example" level="DEBUG"/>
+    </springProfile>
+
+    <springProfile name="uat | prod">
+        <logger name="liquibase" level="WARN"/>
+        <logger name="org.springframework" level="WARN"/>
+<%_ if(microserviceType !== 'none'){ _%>
+        <logger name="org.springframework.web" level="WARN"/>
+<%_ } _%>
+        <logger name="com.example.architecture" level="WARN"/>
+        <logger name="com.example" level="INFO"/>
+    </springProfile>
+
+    <include resource="com/example/spring/architecture/logging/logback/defaults.xml"/>
+</configuration>
