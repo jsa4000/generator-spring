@@ -1,9 +1,10 @@
 {
   "name": "@jsa4000/generator-spring",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "",
   "files": [
-    "dist/generators"
+    "dist/generators",
+    "dist/lib"
   ],
   "scripts": {
     "build": "tsc && npm run copydeps && npm run lint",

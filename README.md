@@ -17,6 +17,19 @@ npm install --engine-strict
 npm run install:local
 ```
 
+### Commands to publish from npm Registry
+
+```bash
+# Login to npm
+npm login  
+
+# Build project
+npm install --engine-strict
+
+# Publish to npmjs (public)
+npm publish --access public
+```
+
 ### Commands for install from npm Registry
 
 // TODO
